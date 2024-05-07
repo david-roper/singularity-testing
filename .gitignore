@@ -1,4 +1,6 @@
-lolcow_latest.sif
-lolcow.sif
+# lolcow_latest.sif
+# lolcow.sif
+
 /ubuntu
-testing.sif
+
+*.sif
