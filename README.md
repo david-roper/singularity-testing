@@ -14,14 +14,12 @@ preprocess /token_dataset/ /token_rabies_outputs \
 --commonspace_reg masking=false,brain_extraction=false,fast_commonspace=true,template_registration=no_reg --data_type int16
 
 
-singularity run -it --rm --user $(id -u) \
+singularity run \
 -B $PWD/token_dataset:/token_dataset:ro \
--B $PWD/token_rabies_outputs:/token_rabies_outputs/ \
-gabdesgreg/rabies:0.4.8 -p MultiProc --local_threads 6 \
+-B $PWD/token_rabies_outputs:/token_rabies_outputs/ /scratch/ropdav/projects/singularity-testing/rabies_0.4.8.sif -p MultiProc --local_threads 6 \
 confound_correction /token_rabies_outputs/ /token_rabies_outputs --conf_list mot_6
 
-singularity run -it --rm --user $(id -u) \
+singularity run \
 -B $PWD/token_dataset:/token_dataset:ro \
--B $PWD/token_rabies_outputs:/token_rabies_outputs/ \
-gabdesgreg/rabies:0.4.8 -p MultiProc --local_threads 6 \
+-B $PWD/token_rabies_outputs:/token_rabies_outputs/ /scratch/ropdav/projects/singularity-testing/rabies_0.4.8.sif -p MultiProc --local_threads 6 \
 analysis /token_rabies_outputs/ /token_rabies_outputs --data_diagnosis
