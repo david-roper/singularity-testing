@@ -1,0 +1,226 @@
+usage: rabies preprocess [-h] [--bold_only] [--anat_autobox] [--bold_autobox] [--apply_despiking] [--HMC_option {intraSubjectBOLD,0,1,2,3}]
+                         [--apply_slice_mc] [--detect_dummy] [--data_type {int16,int32,float32,float64}] [--anat_inho_cor ANAT_INHO_COR]
+                         [--anat_robust_inho_cor ANAT_ROBUST_INHO_COR] [--bold_inho_cor BOLD_INHO_COR] [--bold_robust_inho_cor BOLD_ROBUST_INHO_COR]
+                         [--commonspace_reg COMMONSPACE_REG] [--bold2anat_coreg BOLD2ANAT_COREG] [--nativespace_resampling NATIVESPACE_RESAMPLING]
+                         [--commonspace_resampling COMMONSPACE_RESAMPLING] [--anatomical_resampling ANATOMICAL_RESAMPLING] [--apply_STC] [--TR TR]
+                         [--tpattern {alt-z,seq-z,alt+z,seq+z}] [--stc_axis {X,Y,Z}] [--anat_template ANAT_TEMPLATE] [--brain_mask BRAIN_MASK]
+                         [--WM_mask WM_MASK] [--CSF_mask CSF_MASK] [--vascular_mask VASCULAR_MASK] [--labels LABELS]
+                         bids_dir output_dir
+
+positional arguments:
+  bids_dir              The root folder of the BIDS-formated input data directory.
+                        
+  output_dir            the output path to drop outputs from major preprocessing steps.
+                        
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --bold_only           Apply preprocessing with only EPI scans. Commonspace registration is executed directly using
+                        the corrected EPI 3D reference images. The commonspace registration simultaneously applies
+                        distortion correction, this option will produce only commonspace outputs.
+                        (default: False)
+                        
+  --anat_autobox        Crops out extra space around the brain on the structural image using AFNI's 3dAutobox
+                        https://afni.nimh.nih.gov/pub/dist/doc/program_help/3dAutobox.html.
+                        (default: False)
+                        
+  --bold_autobox        Crops out extra space around the brain on the EPI image using AFNI's 3dAutobox
+                        https://afni.nimh.nih.gov/pub/dist/doc/program_help/3dAutobox.html.
+                        (default: False)
+                        
+  --apply_despiking     Applies AFNI's 3dDespike https://afni.nimh.nih.gov/pub/dist/doc/program_help/3dDespike.html.
+                        (default: False)
+                        
+  --HMC_option {intraSubjectBOLD,0,1,2,3}
+                        Select an option for head motion realignment among the pre-built options from
+                        https://github.com/ANTsX/ANTsR/blob/master/R/ants_motion_estimation.R.
+                        (default: intraSubjectBOLD)
+                        
+  --apply_slice_mc      Whether to apply a slice-specific motion correction after initial volumetric HMC. This can 
+                        correct for interslice misalignment resulting from within-TR motion. With this option, 
+                        motion corrections and the subsequent resampling from registration are applied sequentially
+                        since the 2D slice registrations cannot be concatenate with 3D transforms. 
+                        (default: False)
+                        
+  --detect_dummy        Detect and remove initial dummy volumes from the EPI, and generate a reference EPI based on
+                        these volumes if detected. Dummy volumes will be removed from the output preprocessed EPI.
+                        (default: False)
+                        
+  --data_type {int16,int32,float32,float64}
+                        Specify data format outputs to control for file size.
+                        (default: float32)
+                        
+
+Registration Options:
+  Customize registration operations and troubleshoot registration failures.
+
+  --anat_inho_cor ANAT_INHO_COR
+                        Select options for the inhomogeneity correction of the structural image.
+                        * method: specify which registration strategy is employed for providing a brain mask.
+                        *** Rigid: conducts only rigid registration.
+                        *** Affine: conducts Rigid then Affine registration.
+                        *** SyN: conducts Rigid, Affine then non-linear registration.
+                        *** no_reg: skip registration.
+                        *** N4_reg: previous correction script prior to version 0.3.1.
+                        *** disable: disables the inhomogeneity correction.
+                        * otsu_thresh: The inhomogeneity correction script necessitates an initial correction with a 
+                         Otsu masking strategy (prior to registration of an anatomical mask). This option sets the 
+                         Otsu threshold level to capture the right intensity distribution. 
+                        *** Specify an integer among [0,1,2,3,4]. 
+                        * multiotsu: Select this option to perform a staged inhomogeneity correction, where only 
+                         lower intensities are initially corrected, then higher intensities are iteratively 
+                         included to eventually correct the whole image. This technique may help with images with 
+                         particularly strong inhomogeneity gradients and very low intensities.
+                        *** Specify 'true' or 'false'. 
+                        (default: method=SyN,otsu_thresh=2,multiotsu=false)
+                        
+  --anat_robust_inho_cor ANAT_ROBUST_INHO_COR
+                        When selecting this option, inhomogeneity correction is executed twice to optimize 
+                        outcomes. After completing an initial inhomogeneity correction step, the corrected outputs 
+                        are co-registered to generate an unbiased template, using the same method as the commonspace 
+                        registration. This template is then masked, and is used as a new target for masking during a 
+                        second iteration of inhomogeneity correction. Using this dataset-specific template should 
+                        improve the robustness of masking for inhomogeneity correction.
+                        * apply: select 'true' to apply this option. 
+                         *** Specify 'true' or 'false'. 
+                        * masking: Combine masks derived from the inhomogeneity correction step to support 
+                         registration during the generation of the unbiased template, and then during template 
+                         registration.
+                         *** Specify 'true' or 'false'. 
+                        * brain_extraction: conducts brain extraction prior to template registration based on the 
+                         combined masks from inhomogeneity correction. This will enhance brain edge-matching, but 
+                         requires good quality masks. This should be selected along the 'masking' option.
+                         *** Specify 'true' or 'false'. 
+                        * template_registration: Specify a registration script for the alignment of the 
+                         dataset-generated unbiased template to a reference template for masking.
+                        *** Rigid: conducts only rigid registration.
+                        *** Affine: conducts Rigid then Affine registration.
+                        *** SyN: conducts Rigid, Affine then non-linear registration.
+                        *** no_reg: skip registration.
+                        (default: apply=false,masking=false,brain_extraction=false,template_registration=SyN)
+                        
+  --bold_inho_cor BOLD_INHO_COR
+                        Same as --anat_inho_cor, but for the EPI images.
+                        (default: method=Rigid,otsu_thresh=2,multiotsu=false)
+                        
+  --bold_robust_inho_cor BOLD_ROBUST_INHO_COR
+                        Same as --anat_robust_inho_cor, but for the EPI images.
+                        (default: apply=false,masking=false,brain_extraction=false,template_registration=SyN)
+                        
+  --commonspace_reg COMMONSPACE_REG
+                        Specify registration options for the commonspace registration.
+                        * masking: Combine masks derived from the inhomogeneity correction step to support 
+                         registration during the generation of the unbiased template, and then during template 
+                         registration.
+                        *** Specify 'true' or 'false'. 
+                        * brain_extraction: conducts brain extraction prior to template registration based on the 
+                         combined masks from inhomogeneity correction. This will enhance brain edge-matching, but 
+                         requires good quality masks. This should be selected along the 'masking' option.
+                        *** Specify 'true' or 'false'. 
+                        * template_registration: Specify a registration script for the alignment of the 
+                         dataset-generated unbiased template to the commonspace atlas.
+                        *** Rigid: conducts only rigid registration.
+                        *** Affine: conducts Rigid then Affine registration.
+                        *** SyN: conducts Rigid, Affine then non-linear registration.
+                        *** no_reg: skip registration.
+                        * fast_commonspace: Skip the generation of a dataset-generated unbiased template, and 
+                         instead, register each scan independently directly onto the commonspace atlas, using the 
+                         template_registration. This option can be faster, but may decrease the quality of 
+                         alignment between subjects. 
+                        *** Specify 'true' or 'false'. 
+                        (default: masking=false,brain_extraction=false,template_registration=SyN,fast_commonspace=false)
+                        
+  --bold2anat_coreg BOLD2ANAT_COREG
+                        Specify the registration script for cross-modal alignment between the EPI and structural
+                        images. This operation is responsible for correcting EPI susceptibility distortions.
+                        * masking: With this option, the brain masks obtained from the EPI inhomogeneity correction 
+                         step are used to support registration.
+                        *** Specify 'true' or 'false'. 
+                        * brain_extraction: conducts brain extraction prior to registration using the EPI masks from 
+                         inhomogeneity correction. This will enhance brain edge-matching, but requires good quality 
+                         masks. This should be selected along the 'masking' option.
+                        *** Specify 'true' or 'false'. 
+                        * registration: Specify a registration script.
+                        *** Rigid: conducts only rigid registration.
+                        *** Affine: conducts Rigid then Affine registration.
+                        *** SyN: conducts Rigid, Affine then non-linear registration.
+                        *** no_reg: skip registration.
+                        (default: masking=false,brain_extraction=false,registration=SyN)
+                        
+
+Resampling Options:
+  The following options allow to resample the voxel dimensions for the preprocessed EPIs
+  or for the anatomical images during registration.
+  The resampling syntax must be 'dim1xdim2xdim3' (in mm), follwing the RAS axis convention
+  (dim1=Right-Left, dim2=Anterior-Posterior, dim3=Superior-Inferior). If 'inputs_defined'
+  is provided instead of axis dimensions, the original dimensions are preserved.
+
+  --nativespace_resampling NATIVESPACE_RESAMPLING
+                        Can specify a resampling dimension for the nativespace fMRI outputs.
+                        (default: inputs_defined)
+                        
+  --commonspace_resampling COMMONSPACE_RESAMPLING
+                        Can specify a resampling dimension for the commonspace fMRI outputs.
+                        (default: inputs_defined)
+                        
+  --anatomical_resampling ANATOMICAL_RESAMPLING
+                        
+                        This specifies resampling dimensions for the anatomical registration targets. By 
+                        default, images are resampled to isotropic resolution based on the smallest dimension
+                        among the provided anatomical images (EPI images instead if --bold_only is True). 
+                        Increasing voxel resampling size will increase registration speed at the cost of 
+                        accuracy.
+                        (default: inputs_defined)
+                        
+
+STC Options:
+  Specify Slice Timing Correction (STC) info that is fed to AFNI's 3dTshift
+  (https://afni.nimh.nih.gov/pub/dist/doc/program_help/3dTshift.html). The STC is applied
+  in the anterior-posterior orientation, and thus RABIES assumes slices were acquired in
+  this direction.
+
+  --apply_STC           Select this option to apply the STC step.
+                        (default: False)
+                        
+  --TR TR               Specify repetition time (TR) in seconds. (e.g. --TR 1.2)
+                        (default: auto)
+                        
+  --tpattern {alt-z,seq-z,alt+z,seq+z}
+                        Specify if interleaved ('alt') or sequential ('seq') acquisition, and specify in which 
+                        direction (- or +) to apply the correction. If slices were acquired from front to back, 
+                        the correction should be in the negative (-) direction. Refer to this discussion on the 
+                        topic for more information https://github.com/CoBrALab/RABIES/discussions/217.
+                        (default: alt-z)
+                        
+  --stc_axis {X,Y,Z}    Can specify over which axis of the image the STC must be applied. Generally, the correction 
+                        should be over the Y axis, which corresponds to the anteroposterior axis in RAS convention. 
+                        (default: Y)
+                        
+
+Template Files:
+  Specify commonspace template and associated mask/label files. By default, RABIES
+  provides the mouse DSURQE atlas
+  https://wiki.mouseimaging.ca/display/MICePub/Mouse+Brain+Atlases.
+
+  --anat_template ANAT_TEMPLATE
+                        Anatomical file for the commonspace atlas.
+                        (default: /home/rabies/.local/share/rabies/DSURQE_40micron_average.nii.gz)
+                        
+  --brain_mask BRAIN_MASK
+                        Brain mask aligned with the template.
+                        (default: /home/rabies/.local/share/rabies/DSURQE_40micron_mask.nii.gz)
+                        
+  --WM_mask WM_MASK     White matter mask aligned with the template.
+                        (default: /home/rabies/.local/share/rabies/DSURQE_40micron_eroded_WM_mask.nii.gz)
+                        
+  --CSF_mask CSF_MASK   CSF mask aligned with the template.
+                        (default: /home/rabies/.local/share/rabies/DSURQE_40micron_eroded_CSF_mask.nii.gz)
+                        
+  --vascular_mask VASCULAR_MASK
+                        Can provide a mask of major blood vessels to compute associated nuisance timeseries.
+                        The default mask was generated by applying MELODIC ICA and selecting the resulting 
+                        component mapping onto major brain vessels.
+                        (default: /home/rabies/.local/share/rabies/vascular_mask.nii.gz)
+                        
+  --labels LABELS       Labels file providing the atlas anatomical annotations.
+                        (default: /home/rabies/.local/share/rabies/DSURQE_40micron_labels.nii.gz)
