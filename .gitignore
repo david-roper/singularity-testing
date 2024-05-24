@@ -7,3 +7,4 @@
 input_BIDS
 
 /token_*
+/venv
