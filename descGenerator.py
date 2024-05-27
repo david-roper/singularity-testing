@@ -22,10 +22,14 @@ for command in text:
     testText = command.split('\n')
     firstDesc = testText[0].split("  ")
     title = firstDesc[0].split(" ")[0]
-    firstDesc = firstDesc[0].split(" ")
-    
-    
-    desc = ' ' +  ' '.join(testText[1:-3])
+    firstDesc = firstDesc[0].split("  ")
+
+    print(testText[0:-1])
+    print(len(testText))
+    if len(testText) > 2:
+        desc =  ' '.join(testText[1:-3])
+    else:
+        desc =  ' '.join(testText[0])
     desc = desc.replace("  ", "")
     
     defText = ""
