@@ -1,20 +1,20 @@
 def descMaker(title, desc, default):
     value_key = title.upper()
-    descString = '{\n "id": "' + title + '", \n "name": "' + title + '", \n "description": "' + desc  + '", \n "optional": true, \n "type": "String", \n "value_key": ["' + value_key + '"], \n "command-line-flag": "--' +  title + '", \n "default-value": "' + default  + '"\n}, \n'
+    descString = '{\n "id": "' + title + '", \n "name": "' + title + '", \n "description": "' + desc  + '", \n "optional": true, \n "type": "String", \n "value-key": "[' + value_key + ']", \n "command-line-flag": "--' +  title + '", \n "default-value": "' + default  + '"\n}, \n'
     return descString
 
-f = open("helpOutput.txt","r")
-open('output.txt', 'w').close()
-outputs = open("output.txt", "a")
+f = open("helpOutputConfound.txt","r")
+#clear output file
+open('outputConfound.txt', 'w').close()
+outputs = open("outputConfound.txt", "a")
 
 cmdline = ''
 
-#print(f.read())
 
 text = f.read()
 
 text = text.split("--")
-text = text[29:]
+# text = text[29:]
 
 outputs.write("{\n")
 
