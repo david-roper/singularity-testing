@@ -3,10 +3,10 @@ def descMaker(title, desc, default):
     descString = '{\n "id": "' + title + '", \n "name": "' + title + '", \n "description": "' + desc  + '", \n "optional": true, \n "type": "String", \n "value-key": "[' + value_key + ']", \n "command-line-flag": "--' +  title + '", \n "default-value": "' + default  + '"\n}, \n'
     return descString
 
-f = open("helpOutputConfound.txt","r")
+f = open("helpOutputAnalysis.txt","r")
 #clear output file
-open('outputConfound.txt', 'w').close()
-outputs = open("outputConfound.txt", "a")
+open('outputAnalysis.txt', 'w').close()
+outputs = open("outputAnalysis.txt", "a")
 
 cmdline = ''
 
