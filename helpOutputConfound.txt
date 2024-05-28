@@ -1,0 +1,108 @@
+  --nativespace_analysis
+                        Conduct confound correction and analysis in native space.
+                        (default: False)
+                        
+  --image_scaling {None,background_noise,global_variance,voxelwise_standardization,grand_mean_scaling,voxelwise_mean}
+                        Select an option for scaling the image variance to match the intensity profile of 
+                        different scans and avoid biases in data variance and amplitude estimation during analysis.
+                        The variance explained from confound regression is also scaled accordingly for later use with 
+                        --data_diagnosis. 
+                        *** None: No scaling is applied, only detrending.
+                        *** background_noise: a mask is derived to map background noise, and scale the image 
+                           intensity relative to the noise standard deviation. 
+                        *** global_variance: After applying confound correction, the cleaned timeseries are scaled 
+                           according to the total standard deviation of all voxels, to scale total variance to 1. 
+                        *** voxelwise_standardization: After applying confound correction, each voxel is separately 
+                           scaled to unit variance (z-scoring). 
+                        *** grand_mean_scaling: Timeseries are divided by the mean signal across voxel, and 
+                           multiplied by 100 to obtain percent BOLD fluctuations. 
+                        *** voxelwise_mean: each voxel is seperataly scaled according to its mean intensity, 
+                           a method suggested with AFNI https://afni.nimh.nih.gov/afni/community/board/read.php?1,161862,161864. 
+                           Timeseries are then multiplied by 100 to obtain percent BOLD fluctuations. 
+                        (default: global_variance)
+                        
+  --detrending_order {linear,quadratic}
+                        Select between linear or quadratic (second-order) detrending of voxel timeseries.
+                        (default: linear)
+                        
+  --conf_list [{WM_signal,CSF_signal,vascular_signal,global_signal,aCompCor,mot_6,mot_24,mean_FD} ...]
+                        Select list of nuisance regressors that will be applied on voxel timeseries, i.e., confound
+                        regression.
+                        *** WM/CSF/vascular/global_signal: correspond to mean signal from WM/CSF/vascular/brain 
+                           masks.
+                        *** mot_6: 6 rigid head motion correction parameters.
+                        *** mot_24: mot_6 + their temporal derivative, then all 12 parameters squared, as in 
+                           Friston et al. (1996, Magnetic Resonance in Medicine).
+                        *** aCompCor: method from Muschelli et al. (2014, Neuroimage), where component timeseries
+                           are obtained using PCA, conducted on the combined WM and CSF masks voxel timeseries. 
+                           Components adding up to 50 percent of the variance are included.
+                        *** mean_FD: the mean framewise displacement timecourse.
+                        (default: [])
+                        
+  --frame_censoring FRAME_CENSORING
+                        Censor frames that are highly corrupted (i.e. 'scrubbing'). 
+                        * FD_censoring: Apply frame censoring based on a framewise displacement threshold. The frames 
+                         that exceed the given threshold, together with 1 back and 2 forward frames will be masked 
+                         out, as in Power et al. (2012, Neuroimage).
+                        *** Specify 'true' or 'false'. 
+                        * FD_threshold: the FD threshold in mm. 
+                        * DVARS_censoring: Will remove timepoints that present outlier values on the DVARS metric 
+                         (temporal derivative of global signal). This method will censor timepoints until the 
+                         distribution of DVARS values across time does not contain outliers values above or below 2.5 
+                         standard deviations.
+                        *** Specify 'true' or 'false'. 
+                        * minimum_timepoint: Can set a minimum number of timepoints remaining after frame censoring. 
+                         If the threshold is not met, an empty file is generated and the scan is not considered in 
+                         further steps. 
+                        (default: FD_censoring=false,FD_threshold=0.05,DVARS_censoring=false,minimum_timepoint=3)
+                        
+  --TR TR               Specify repetition time (TR) in seconds. (e.g. --TR 1.2)
+                        (default: auto)
+                        
+  --highpass HIGHPASS   Specify highpass filter frequency.
+                        (default: None)
+                        
+  --lowpass LOWPASS     Specify lowpass filter frequency.
+                        (default: None)
+                        
+  --edge_cutoff EDGE_CUTOFF
+                        Specify the number of seconds to cut at beginning and end of acquisition if applying a
+                        frequency filter. Frequency filters generate edge effects at begining and end of the
+                        timeseries. We recommend to cut those timepoints (around 30sec at both end for 0.01Hz 
+                        highpass.).
+                        (default: 0)
+                        
+  --smoothing_filter SMOOTHING_FILTER
+                        Specify filter size in mm for spatial smoothing. Will apply nilearn's function 
+                        https://nilearn.github.io/modules/generated/nilearn.image.smooth_img.html
+                        (default: None)
+                        
+  --match_number_timepoints
+                        With this option, only a subset of the timepoints are kept post-censoring to match the 
+                        --minimum_timepoint number for all scans. This can be conducted to avoid inconsistent 
+                        temporal degrees of freedom (tDOF) between scans during downstream analysis. We recommend 
+                        selecting this option if a significant confounding effect of tDOF is detected during --data_diagnosis.
+                        The extra timepoints removed are randomly selected among the set available post-censoring.
+                        (default: False)
+                        
+  --ica_aroma ICA_AROMA
+                        Apply ICA-AROMA denoising (Pruim et al. 2015). The original classifier was modified to incorporate 
+                        rodent-adapted masks and classification hyperparameters.
+                        * apply: apply the denoising.
+                        *** Specify 'true' or 'false'. 
+                        * dim: Specify a pre-determined number of MELODIC components to derive. '0' will use an automatic 
+                         estimator. 
+                        * random_seed: For reproducibility, this option sets a fixed random seed for MELODIC. 
+                        (default: apply=false,dim=0,random_seed=1)
+                        
+  --read_datasink       
+                        Choose this option to read preprocessing outputs from datasinks instead of the saved 
+                        preprocessing workflow graph. This allows to run confound correction without having 
+                        available RABIES preprocessing folders, but the targetted datasink folders must follow the
+                        structure of RABIES preprocessing.
+                        (default: False)
+                        
+  --timeseries_interval TIMESERIES_INTERVAL
+                        Before confound correction, can crop the timeseries within a specific interval.
+                        e.g. '0,80' for timepoint 0 to 80.
+                        (default: all)
