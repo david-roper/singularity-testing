@@ -78,7 +78,7 @@ export default defineInstrument({
       variant: 'radio',
       label: {
         en: 'Sex',
-        fr: "Sexe de la souris"
+        fr: "sexe de la souris"
       },
       options: {
         en: {
@@ -99,7 +99,7 @@ export default defineInstrument({
         fr: "Nom du project"
       }
     },
-    sessionDate: {
+    timePointDate: {
       kind: 'date',
       label: {
         en: 'date of session',
@@ -125,7 +125,7 @@ export default defineInstrument({
     mouseAge: z.number().min(0).max(160),
     projectName: z.string(),
     mouseSex: z.string(),
-    sessionDate: z.date()
+    timePointDate: z.date()
   }),
   measures: {
     mouseStrain: {
@@ -168,13 +168,13 @@ export default defineInstrument({
       },
       ref: "projectName"
     },
-    sessionDate: {
+    timePointDate: {
       kind: 'const',
       label: {
-        en: 'Session date',
+        en: 'Time point date',
         fr: 'Date de la session'
       },
-      ref: "sessionDate"
+      ref: "timePointDate"
     }
   }
 });
