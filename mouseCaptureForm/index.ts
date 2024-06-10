@@ -23,14 +23,15 @@ export default defineInstrument({
       options: {
         en: {
           0: "M83 hemizygous",
-          1: "C57"
+          1: "C57",
+          2: "Wild Type"
         },
         fr: {
           0: "M83 hemizygous",
-          1: "C57"
+          1: "C57",
+           2: "Wild Type"
         }
       }
-
     },
     furColour: {
       kind: 'string',
@@ -81,10 +82,17 @@ export default defineInstrument({
         en: 'Project Name',
         fr: "Nom du project"
       }
+    },
+    sessionDate: {
+      kind: 'date',
+      label: {
+        en: 'date of session',
+        fr: 'date de la session'
+      }
     }
   },
   details: {
-    description: { en: 'A form to track meta data of mouse experiments', fr: 'une form pour suivre les données de la souris' },
+    description: { en: 'A form to track meta data of mouse experiments', fr: 'une forme pour suivre les données de la souris' },
     estimatedDuration: 2,
     instructions: {
       en: ['Please complete this form after a completed session'],
@@ -100,7 +108,8 @@ export default defineInstrument({
     mouseWeight: z.number(),
     mouseAge: z.number(),
     projectName: z.string(),
-    mouseGender: z.string()
+    mouseGender: z.string(),
+    sessionDate: z.date()
   }),
   measures: {
     mouseType: {
@@ -131,7 +140,7 @@ export default defineInstrument({
       kind: "const",
       label: {
         en: "Mouse gender",
-        fr: "sexe de la souris"
+        fr: "Sexe de la souris"
       },
       ref: "mouseGender"
     },
@@ -142,6 +151,14 @@ export default defineInstrument({
         fr: "Nom du Projet"
       },
       ref: "projectName"
+    },
+    sessionDate: {
+      kind: 'const',
+      label: {
+        en: 'Session date',
+        fr: 'Date de la session'
+      },
+      ref: "sessionDate"
     }
   }
 });
