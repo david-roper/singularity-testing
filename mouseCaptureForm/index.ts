@@ -13,11 +13,11 @@ export default defineInstrument({
   },
   tags: { en: ['mice', 'neuroscience'], fr: ['souris', 'neuroscience'] },
   content: {
-    mouseType: {
+    mouseStrain: {
       kind: 'string',
       variant: 'select',
       label: {
-        en: 'Type of mouse',
+        en: 'Strain',
         fr: 'Type de souris'
       },
       options: {
@@ -35,10 +35,26 @@ export default defineInstrument({
     },
     furColour: {
       kind: 'string',
-      variant: 'input',
+      variant: 'select',
       label: {
         en: "Fur colour",
         fr: "Couleur de la fourrure"
+      },
+      options: {
+        en: {
+          0: "Black",
+          1: "Brown",
+          2: "White",
+          3: "Grey",
+          4: "Agouti"
+        },
+        fr: {
+          0: "Noire",
+          1: "Brun",
+          2: "Blanc",
+          3: "Gris",
+          4: "Agouti"
+        }
       }
     },
     mouseWeight: {
@@ -57,11 +73,11 @@ export default defineInstrument({
         fr: "Âge de la souris (en semaines)"
       }
     },
-    mouseGender: {
+    mouseSex: {
       kind: 'string',
       variant: 'radio',
       label: {
-        en: 'Mouse Gender',
+        en: 'Sex',
         fr: "sexe de la souris"
       },
       options: {
@@ -103,22 +119,22 @@ export default defineInstrument({
   },
 
   validationSchema: z.object({
-    mouseType: z.string(),
+    mouseStrain: z.string(),
     furColour: z.string(),
-    mouseWeight: z.number(),
-    mouseAge: z.number(),
+    mouseWeight: z.number().min(1).max(120),
+    mouseAge: z.number().min(0).max(200),
     projectName: z.string(),
-    mouseGender: z.string(),
+    mouseSex: z.string(),
     sessionDate: z.date()
   }),
   measures: {
-    mouseType: {
+    mouseStrain: {
       kind: "const",
       label: {
         en: "Mouse Type",
         fr: "Type de souris"
       },
-      ref: "mouseType"
+      ref: "mouseStrain"
     },
     furColour: { 
       kind: "const",
@@ -136,13 +152,13 @@ export default defineInstrument({
       },
       ref: "mouseWeight"
     },
-    mouseGender: {
+    mouseSex: {
       kind: "const",
       label: {
         en: "Mouse gender",
         fr: "Sexe de la souris"
       },
-      ref: "mouseGender"
+      ref: "mouseSex"
     },
     projectName: {
       kind: "const",
