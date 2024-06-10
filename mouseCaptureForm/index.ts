@@ -78,7 +78,7 @@ export default defineInstrument({
       variant: 'radio',
       label: {
         en: 'Sex',
-        fr: "sexe de la souris"
+        fr: "Sexe de la souris"
       },
       options: {
         en: {
