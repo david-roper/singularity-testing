@@ -121,8 +121,8 @@ export default defineInstrument({
   validationSchema: z.object({
     mouseStrain: z.string(),
     furColour: z.string(),
-    mouseWeight: z.number().min(1).max(120),
-    mouseAge: z.number().min(0).max(200),
+    mouseWeight: z.number().min(1).max(40),
+    mouseAge: z.number().min(0).max(160),
     projectName: z.string(),
     mouseSex: z.string(),
     sessionDate: z.date()
