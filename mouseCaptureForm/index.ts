@@ -29,7 +29,7 @@ export default defineInstrument({
         fr: {
           0: "M83 hemizygous",
           1: "C57",
-           2: "Wild Type"
+          2: "Wild Type"
         }
       }
     },
