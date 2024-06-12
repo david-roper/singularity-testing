@@ -1,3 +1,20 @@
+rabies confound_correction [-h] [--nativespace_analysis]
+                                  [--image_scaling {None,background_noise,global_variance,voxelwise_standardization,grand_mean_scaling,voxelwise_mean}]
+                                  [--detrending_order {linear,quadratic}]
+                                  [--conf_list [{WM_signal,CSF_signal,vascular_signal,global_signal,aCompCor,mot_6,mot_24,mean_FD} ...]]
+                                  [--frame_censoring FRAME_CENSORING] [--TR TR] [--highpass HIGHPASS] [--lowpass LOWPASS] [--edge_cutoff EDGE_CUTOFF]
+                                  [--smoothing_filter SMOOTHING_FILTER] [--match_number_timepoints] [--ica_aroma ICA_AROMA] [--read_datasink]
+                                  [--timeseries_interval TIMESERIES_INTERVAL]
+                                  preprocess_out output_dir
+
+positional arguments:
+  preprocess_out        path to RABIES preprocessing output directory.
+                        
+  output_dir            path for confound correction output directory.
+                        
+
+optional arguments:
+  -h, --help            show this help message and exit
   --nativespace_analysis
                         Conduct confound correction and analysis in native space.
                         (default: False)
@@ -106,3 +123,4 @@
                         Before confound correction, can crop the timeseries within a specific interval.
                         e.g. '0,80' for timepoint 0 to 80.
                         (default: all)
+                        
