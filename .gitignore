@@ -4,7 +4,8 @@
 /ubuntu
 
 *.sif
-input_BIDS
+test_dataset
+test_dataset_outputs
 
 /token_*
 /venv
