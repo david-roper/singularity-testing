@@ -9,3 +9,5 @@ test_dataset_outputs
 
 /token_*
 /venv
+/preprocess_outputs
+/confound-correction-outputs
