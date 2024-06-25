@@ -23,3 +23,19 @@ singularity run \
 -B $PWD/token_dataset:/token_dataset:ro \
 -B $PWD/token_rabies_outputs:/token_rabies_outputs/ /scratch/ropdav/projects/singularity-testing/rabies_0.4.8.sif -p MultiProc --local_threads 6 \
 analysis /token_rabies_outputs/ /token_rabies_outputs --data_diagnosis
+
+singularity run \
+-B $PWD/test_dataset:/test_dataset:ro \
+-B $PWD/test_dataset_outputs:/test_dataset_outputs/ \
+gabdesgreg/rabies:0.4.8 -p MultiProc --local_threads 4 \
+confound_correction /test_dataset_outputs/ /test_dataset_outputs \
+--frame_censoring FD_censoring=true,FD_threshold=0.05,DVARS_censoring=false,minimum_timepoint=80 \
+--conf_list mot_6 WM_signal CSF_signal --smoothing_filter 0.3
+
+ singularity run \
+ -B $PWD/test_dataset:/scratch/ropdav/projects/forks/test_nipoppy/extra-stuff/Rabies-preprocess-stuff/0.5.1/output:ro \
+-B $PWD/test_dataset_outputs:/scratch/ropdav/projects/forks/test_nipoppy/extra-stuff/rabies-confound-data/ \
+  rabies.sif -p MultiProc --local_threads 4 \
+   confound_correction /test_dataset_outputs/ /test_dataset_outputs \
+  --frame_censoring FD_censoring=true,FD_threshold=0.05,DVARS_censoring=false,minimum_timepoint=80 \
+   --conf_list mot_6 WM_signal CSF_signal --smoothing_filter 0.3
